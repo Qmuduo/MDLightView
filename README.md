@@ -85,3 +85,11 @@ Debug APK 只包含 x86_64 原生库，适用于本机模拟器；Release APK �
 ## 2026-10-18 新建文档
 
 首页新增“新建文档”入口。输入文件名后创建本机空白 Markdown，并立即进入源码编辑；草稿、阅读记录和另存副本继续使用现有本地流程。命名校验支持 `.md` 与 `.markdown`，不填写扩展名时自动添加 `.md`。本次验收截图和独立 APK 位于 `work/artifacts/new-document/`。
+
+## 2026-10-18 品牌标识更新
+
+首页品牌栏改用折页标记，应用桌面图标、Android 自适应与单色图标、网页 favicon 已统一更新。设计来源和资源说明见 `assets/brand-v4/`。
+
+- ARM64 Android 手机安装包：`work/artifacts/branding-v4/app-release-arm64-v8a.apk`。
+- x86_64 Android 模拟器安装包：`work/artifacts/branding-v4/app-release-x86_64.apk`。
+- 两个 APK 均已构建并核对应用包名与处理器架构；ARM64 包尚未连接实体手机实装。

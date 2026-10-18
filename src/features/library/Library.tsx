@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { DocumentRecord } from '../documents/repository';
 import type { Palette } from '../../theme/colors';
 import { Action } from '../../components/Action';
@@ -34,9 +34,8 @@ export function Library({ records, colors, busy, showSample, themeIcon, onOpen, 
   const latest = records[0];
   return <ScrollView style={[styles.scroll, { backgroundColor: colors.background }]} contentContainerStyle={styles.page}>
     <View style={styles.brandBar}>
-      <View style={[styles.brandMark, { backgroundColor: colors.accent }]}>
-        <Text style={[styles.markLetter, { color: colors.onAccent }]}>M</Text>
-        <Icon name="arrow-down" color={colors.onAccent} size={13} />
+      <View style={[styles.brandMark, { backgroundColor: colors.soft }]}>
+        <Image source={require('../../../assets/brand-v4/fold-mark.png')} style={styles.brandSymbol} resizeMode="contain" />
       </View>
       <View style={styles.brandCopy}>
         <Text style={[styles.brand, { color: colors.text }]}>轻览 <Text style={[styles.brandEnglish, { color: colors.muted }]}>MD</Text></Text>
@@ -126,8 +125,8 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   page: { width: '100%', maxWidth: 720, alignSelf: 'center', paddingHorizontal: 22, paddingTop: 13, paddingBottom: 28 },
   brandBar: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 11 },
-  brandMark: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 0 },
-  markLetter: { fontSize: 20, fontWeight: '800', fontFamily: 'serif', marginRight: -2 },
+  brandMark: { width: 40, height: 40, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  brandSymbol: { width: 31, height: 31 },
   brandCopy: { flex: 1 },
   brand: { fontSize: 18, fontWeight: '700', letterSpacing: 0.6 },
   brandEnglish: { fontSize: 12, fontWeight: '500', letterSpacing: 0 },

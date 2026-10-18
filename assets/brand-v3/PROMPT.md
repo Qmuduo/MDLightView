@@ -1,0 +1,10 @@
+# 轻览 MD — 折页方向预览
+
+使用内置 image_gen 生成。concept.png 是 Logo 与应用图标的组合预览，不是已接入应用的最终资源。
+
+Use case: logo-brand.
+Create one exceptionally well designed, restrained brand identity presentation for a lightweight Chinese Markdown reading app called "轻览". Exact brand lockup text "轻览" with small "MD" after it.
+This is a completely NEW design, not the previous generic open book. Aim for the clarity and craft of a professional independent software brand. Flat graphic design, precise optical geometry, confident generous whitespace.
+Core symbol: a single abstract folded paper ribbon, a compact asymmetric angular mark with one beautiful diagonal negative-space cut. It should subtly hint at a lowercase m or a page being lifted, but NOT be a literal letter M, book, leaf, bird, arrow or document outline. Construct it from two or at most three bold simple polygonal pieces with very gently softened corners. Main deep cobalt #315CC6, one restrained pale periwinkle folded face. Elegant silhouette, instantly readable at 24px, distinctive intentional geometry. No thin strokes, no text lines, no star or sparkle.
+Presentation: wide clean pale porcelain #F7F8FA canvas. Left two thirds: large horizontal logo lockup, symbol at left and carefully typeset Chinese "轻览" at right, refined medium-weight modern Chinese sans-serif, small airy MD in soft gray-blue. Right third: one large rounded square app icon in saturated cobalt blue; it uses exactly the same abstract symbol reversed in warm white with pale periwinkle fold. The symbol is optically centered, roughly 54% of the tile width with ample padding. This is a flat presentation of the logo and icon, not a physical product mockup. One tiny caption below left reading "MDLightView" in widely tracked refined sans serif.
+Avoid generic open books, symmetric butterfly/leaf marks, heavy bold Chinese type, gradients, glow, shadows, 3D, noisy texture, diagrams, grids, watermarks, marketing slogans, extra explanatory text. Make the composition exceptionally clean and visually refined.
