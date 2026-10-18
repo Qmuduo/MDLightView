@@ -7,6 +7,8 @@ import { buildReaderPage, renderMarkdown } from './markdown';
 import type { Palette } from '../../theme/colors';
 import { Action } from '../../components/Action';
 import { Icon, IconButton, type IconName } from '../../components/Icon';
+import { EditorToolbar } from './EditorToolbar';
+import { applyEditorCommand, type EditorCommand, type TextSelection } from './editorCommands';
 
 export function Reader({ record, source, editing, busy, colors, theme, themeIcon, draftStatus, onBack, onTheme, onEdit, onChange, onSave, onProgress }: {
   record: DocumentRecord; source: string; editing: boolean; busy: boolean; colors: Palette; theme: 'light' | 'dark';
@@ -14,8 +16,10 @@ export function Reader({ record, source, editing, busy, colors, theme, themeIcon
   onEdit: () => void; onChange: (value: string) => void; onSave: () => void; onProgress: (value: number) => void;
 }) {
   const web = useRef<WebView>(null);
+  const editor = useRef<TextInput>(null);
   const progress = useRef(record.progress);
   const [readProgress, setReadProgress] = useState(Math.round(record.progress * 100));
+  const [selection, setSelection] = useState<TextSelection>({ start: source.length, end: source.length });
   const [toc, setToc] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [reload, setReload] = useState(0);
@@ -23,6 +27,13 @@ export function Reader({ record, source, editing, busy, colors, theme, themeIcon
   const headings = useMemo(() => editing ? [] : renderMarkdown(source).headings, [source, editing]);
   // Progress updates are kept out of this memo so a scroll never reloads the WebView.
   const page = useMemo(() => ({ html: editing ? '' : buildReaderPage(source, theme, progress.current) }), [source, theme, editing]);
+
+  const applyCommand = (command: EditorCommand) => {
+    const result = applyEditorCommand(source, selection, command);
+    onChange(result.text);
+    setSelection(result.selection);
+    editor.current?.focus();
+  };
 
   const openExternal = (url: string) => {
     if (!/^(https?:\/\/|mailto:)/i.test(url)) return;
@@ -46,8 +57,9 @@ export function Reader({ record, source, editing, busy, colors, theme, themeIcon
       <Text accessibilityLiveRegion="polite" numberOfLines={1} style={[styles.draftStatusText, { color: colors.muted }]}>{draftStatus || '编辑时自动保留在本机'}</Text>
     </View>}
 
-    {editing ? <TextInput accessibilityLabel="Markdown 源码" value={source} onChangeText={onChange} multiline
+    {editing ? <TextInput ref={editor} accessibilityLabel="Markdown 源码" value={source} onChangeText={onChange} multiline
       autoCapitalize="none" autoCorrect={false} spellCheck={false} textAlignVertical="top" editable={!busy}
+      selection={selection} onSelectionChange={event => setSelection(event.nativeEvent.selection)}
       selectionColor={colors.accent} keyboardAppearance={theme}
       style={[styles.editor, { color: colors.text, backgroundColor: colors.paper, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' }]} /> :
       loadError ? <View style={styles.error}>
@@ -71,6 +83,8 @@ export function Reader({ record, source, editing, busy, colors, theme, themeIcon
             if (message.type === 'link' && typeof message.url === 'string') openExternal(message.url);
           } catch { /* Ignore malformed messages; document content never gets a native API. */ }
         }} />}
+
+    {editing && <EditorToolbar colors={colors} disabled={busy} onCommand={applyCommand} />}
 
     <View style={[styles.toolbar, { backgroundColor: colors.paper, borderTopColor: colors.border }]}>
       {editing ? <>
