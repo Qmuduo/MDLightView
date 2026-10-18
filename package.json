@@ -1,0 +1,46 @@
+{
+  "name": "mdlightview",
+  "description": "轻览 MD：阅读优先的本地 Markdown 阅读器",
+  "license": "0BSD",
+  "version": "0.1.0",
+  "expo": {
+    "autolinking": {
+      "buildFromSource": ["expo-sharing"]
+    }
+  },
+  "main": "index.ts",
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "expo": "~57.0.30",
+    "expo-dev-client": "~57.0.20",
+    "expo-document-picker": "~57.0.3",
+    "expo-file-system": "~57.0.7",
+    "expo-sharing": "57.0.23",
+    "expo-status-bar": "~57.0.1",
+    "expo-system-ui": "~57.0.4",
+    "markdown-it": "^15.0.3",
+    "patch-package": "^8.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-webview": "^13.16.1"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.2.0",
+    "@types/node": "^26.6.5",
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.5"
+  },
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "start:go": "expo start --go",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check:deps": "expo install --check",
+    "export:android": "expo export --platform android --output-dir work/android-export",
+    "postinstall": "patch-package"
+  },
+  "private": true
+}

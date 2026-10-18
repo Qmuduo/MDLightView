@@ -1,0 +1,72 @@
+diff --git a/node_modules/expo-sharing/android/build.gradle b/node_modules/expo-sharing/android/build.gradle
+--- a/node_modules/expo-sharing/android/build.gradle
++++ b/node_modules/expo-sharing/android/build.gradle
+@@ -17,3 +17,4 @@
+ dependencies {
+   implementation 'com.facebook.react:react-android'
++  testImplementation 'junit:junit:4.13.2'
+ }
+diff --git a/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/ShareStreamUriSelector.kt b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/ShareStreamUriSelector.kt
+new file mode 100644
+--- /dev/null
++++ b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/ShareStreamUriSelector.kt
+@@ -0,0 +1,5 @@
++package expo.modules.sharing
++
++/** Selects the single-file URI from Android's two common ACTION_SEND URI locations. */
++internal fun selectSharedStreamUri(extraStream: String?, clipDataUri: String?): String? =
++  extraStream ?: clipDataUri
+diff --git a/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/dataParsers/SimpleShareIntentDataParser.kt b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/dataParsers/SimpleShareIntentDataParser.kt
+--- a/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/dataParsers/SimpleShareIntentDataParser.kt
++++ b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/dataParsers/SimpleShareIntentDataParser.kt
+@@ -18,3 +18,14 @@
+     private fun handleSendAction(context: Context, intent: Intent, type: String): List<SharePayload> {
++      // File providers may label a Markdown document as text/plain and only provide a URI stream.
++      val extraStream = intent.getParcelableExtraCompat<Uri>(Intent.EXTRA_STREAM)?.toString()
++      val clipDataStream = intent.clipData
++        ?.takeIf { it.itemCount > 0 }
++        ?.getItemAt(0)
++        ?.uri
++        ?.toString()
++      val stream = selectSharedStreamUri(extraStream, clipDataStream)?.let { Uri.parse(it) }
++      if (stream != null) {
++        return listOf(createUriPayload(context, stream, type))
++      }
+       return if (type == "text/plain") {
+         val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return emptyList()
+diff --git a/node_modules/expo-sharing/android/src/test/java/expo/modules/sharing/ShareStreamUriSelectorTest.kt b/node_modules/expo-sharing/android/src/test/java/expo/modules/sharing/ShareStreamUriSelectorTest.kt
+new file mode 100644
+--- /dev/null
++++ b/node_modules/expo-sharing/android/src/test/java/expo/modules/sharing/ShareStreamUriSelectorTest.kt
+@@ -0,0 +1,31 @@
++package expo.modules.sharing
++
++import org.junit.Assert.assertEquals
++import org.junit.Assert.assertNull
++import org.junit.Test
++
++class ShareStreamUriSelectorTest {
++  @Test
++  fun `uses ClipData URI when EXTRA_STREAM is absent`() {
++    assertEquals(
++      "content://provider/document/42",
++      selectSharedStreamUri(extraStream = null, clipDataUri = "content://provider/document/42")
++    )
++  }
++
++  @Test
++  fun `prefers EXTRA_STREAM when both URI sources are present`() {
++    assertEquals(
++      "content://provider/extra-stream",
++      selectSharedStreamUri(
++        extraStream = "content://provider/extra-stream",
++        clipDataUri = "content://provider/clip-data"
++      )
++    )
++  }
++
++  @Test
++  fun `returns no URI when neither source is present`() {
++    assertNull(selectSharedStreamUri(extraStream = null, clipDataUri = null))
++  }
++}
