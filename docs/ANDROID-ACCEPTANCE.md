@@ -1,6 +1,34 @@
 # Android 设备验收清单
 
-验收日期：2026-10-18。设备为 `emulator-5554`，Android 16 / API 36 / x86_64；未连接实体手机。Release 设备验收使用 `work/artifacts/app-release-x86_64.apk`；当前标准构建产物 `android/app/build/outputs/apk/release/app-release.apk` 是新构建的 ARM64 包，含 JavaScript bundle，无需 Metro。模拟器结果不能代替实体 ARM64 手机验收。
+验收日期：2026-10-18。设备为 `emulator-5554`，Android 16 / API 36 / x86_64；未连接实体手机。此前基线 Release 设备验收使用 `work/artifacts/app-release-x86_64.apk`。项目默认输出 `android/app/build/outputs/apk/release/app-release.apk` 已恢复为基线 ARM64 APK；UI 重设计版包保存在 `work/artifacts/ui-redesign/`，新建文档版包保存在 `work/artifacts/new-document/`，均含 JavaScript bundle，无需 Metro。模拟器结果不能代替实体 ARM64 手机验收。
+
+## 新建文档功能追加验收
+
+最终 x86_64 Release APK 安装在临时 Android 用户 12 中检查。此用户首次进入首页时显示示例引导；点击“新建文档”显示命名面板，`.md` 默认名称可直接创建，未带扩展名的自定义名称会补为 `.md`。空白文件立即进入源码编辑；输入 `FinalDraftQA` 后自动保留草稿，切换到阅读预览并返回首页后，最近记录显示草稿标记。重开文档后正文恢复。深色主题下的首页与命名面板可读，名称键盘打开时“创建并编辑”操作仍在可见区域。强制停止并重新启动后，首次示例入口隐藏，文档和草稿记录保留。
+
+测试完成后已切回 Android 用户 0 并移除临时用户 12；没有清除或改写用户 0 的应用数据。最终截图位于 `work/artifacts/new-document/device/`。本次增量验收重点覆盖新建、草稿和重启行为；其他文件选择、分享、另存副本等已按上文既有 UI 重设计轮次验收，本次未重复操作。
+
+| 构建 | 结果 |
+| --- | --- |
+| Android JS 导出 | `work/android-export-new-document-final` 成功，741 modules / 19 assets |
+| x86_64 Release APK | 构建及 APK v2 签名检查通过；仅含 x86_64 原生库，安装到 Android 16 模拟器实测 |
+| ARM64 Release APK | 构建及 APK v2 签名检查通过；仅含 arm64-v8a 原生库；未连接 ARM64 实体设备 |
+| 默认 Android Release 输出 | 已恢复原有 ARM64 APK，SHA-256 `93828A7A1551E66F070C39276844DB1549BAD0F5FD852356D23FB2036188A2E8` |
+
+## UI 重设计版验收
+
+本次模拟器测试安装 `work/artifacts/ui-redesign/app-release-x86_64.apk`；构建环境、哈希、自动检查和历史 APK 恢复情况见 `docs/VERIFICATION.md`。测试使用临时 Android 用户 10，完成后切回用户 0 并移除临时用户；未清除原有应用数据。截图保存在 `work/artifacts/ui-redesign/`。
+
+- [x] 空文档库首次实际进入首页，显示“阅读示例”和简洁空状态；首轮阅读返回首页时仍显示该入口。
+- [x] 强制停止后重新启动，示例入口隐藏；最近文档、实际阅读进度和排序正常。
+- [x] 打开真实最近文档继续阅读，显示 23% 进度；目录点击跳转，系统返回关闭目录。
+- [x] 手工浅色、深色与“跟随系统”均可用；模拟器夜间模式开/关后，跟随系统阅读页随之切换。
+- [x] 编辑源码、输入和预览可用；软键盘弹出时下方预览/另存操作仍可见。草稿标记与修改内容在强制停止后恢复。
+- [x] “另存副本”打开系统 Documents 目录并保存新 Markdown 副本；再经首页文件选择器选中副本，正文成功导入和渲染。
+- [x] 将纯文本通过 Android `ACTION_SEND` 分享到应用，创建“分享的文字.md”并展示内容；在全新临时用户中，首次 ACTION_SEND 冷启动直达阅读页，返回首页时示例仍可见，随后冷启动隐藏。
+- [x] 中文标题、长文件名截断、代码块、表格及明暗主题排版可见。
+
+该模拟器的 Android 系统文件选择器在临时用户首次启动时约等待 9 秒扫描 Documents provider，加载完成后保存及导入均成功。ARM64 Release 包已完成构建和签名/ABI 检查，但没有可用的 ARM64 实体手机进行安装验证。
 
 ## Debug Development APK
 

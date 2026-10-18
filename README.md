@@ -4,7 +4,7 @@
 
 ## Windows 本地 Android 开发
 
-本轮已在 Windows 本地构建并安装 x86_64 Debug APK，并构建 ARM64 Release APK。x86_64 Release 模拟器验收包保存在 `work/artifacts/app-release-x86_64.apk`。Android SDK、Gradle 缓存和 CMake 中间文件都位于项目 work/ 目录；没有修改全局 SDK 配置。
+此前 Android 基线轮次已在 Windows 本地构建并安装 x86_64 Debug APK，并构建 ARM64 Release APK。基线 x86_64 Release 模拟器验收包保存在 `work/artifacts/app-release-x86_64.apk`。本次 UI 重设计版 APK 位于 `work/artifacts/ui-redesign/`。Android SDK、Gradle 缓存和 CMake 中间文件都位于项目 work/ 目录；没有修改全局 SDK 配置。
 
 当前检查机工具链：Node v24.19.0、JDK 21（Gradle）、JDK 17（Android/RN 工具链）、Gradle 9.3.1、Android API 36、Build Tools 36.0.0、NDK 27.1.12297006、CMake 3.22.1。模拟器为 Android 16 / API 36 / x86_64。
 
@@ -50,7 +50,7 @@ Debug APK 只包含 x86_64 原生库，适用于本机模拟器；Release APK �
 
 ## 当前范围
 
-- 首页：系统文件选择器、示例、最近阅读。
+- 首页：系统文件选择器、新建空白 Markdown 并直接进入编辑、示例、最近阅读。
 - 阅读：Markdown 标题、表格、列表、引用、代码，标题目录，浅色/深色/跟随系统，阅读位置。
 - 入口：本地文件 URI 与单个文件/文本分享；导入后复制到应用私有目录，历史记录不依赖临时 URI 权限。
 - 编辑：基础源码编辑、草稿保留、阅读预览；另存为新的 Markdown 文件并读回校验，保留原文件。
@@ -69,3 +69,19 @@ Debug APK 只包含 x86_64 原生库，适用于本机模拟器；Release APK �
 - 分享依赖补丁说明：docs/DEPENDENCY-PATCHES.md
 
 源码集中在 src/：features/documents 负责存储与导入，features/reader 负责渲染与目录，features/library 负责首页，theme 负责颜色。
+
+## 2026-10-18 UI 重设计交付
+
+已将批准的预览实现到应用中：首页使用真实本地记录并突出打开文件与继续阅读；阅读页合并顶部栏并提供目录、进度、主题和源码编辑入口；新增首次首页示例引导状态，只在首次使用的当前进程会话显示。示例不会被删除，既有文件、草稿和阅读记录仍保留。
+
+- 新版截图与 APK：`work/artifacts/ui-redesign/`（索引见该目录 README）。
+- x86_64 Release 模拟器包：`work/artifacts/ui-redesign/app-release-x86_64.apk`。
+- ARM64 Release 手机包：`work/artifacts/ui-redesign/app-release-arm64-v8a.apk`。
+- 自动检查：Vitest 23 项通过、TypeScript 检查通过、Expo 依赖检查通过、Android 导出 740 modules / 19 assets。
+- 新版包已在 Android 16 / API 36 / x86_64 模拟器检查首次引导、读者、目录、主题、键盘、草稿、另存副本、文件选择及文本分享。ARM64 APK 已构建并检查 ABI/签名，未连接 ARM64 实体手机。
+
+详细设备范围与 SHA-256 见 `docs/ANDROID-ACCEPTANCE.md` 和 `docs/VERIFICATION.md`。Release 包使用本机 debug 证书，不是上架签名包。
+
+## 2026-10-18 新建文档
+
+首页新增“新建文档”入口。输入文件名后创建本机空白 Markdown，并立即进入源码编辑；草稿、阅读记录和另存副本继续使用现有本地流程。命名校验支持 `.md` 与 `.markdown`，不填写扩展名时自动添加 `.md`。本次验收截图和独立 APK 位于 `work/artifacts/new-document/`。

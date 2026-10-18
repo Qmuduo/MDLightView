@@ -1,3 +1,5 @@
+import { normalizeNewDocumentName, validateImport } from './validation';
+
 export interface StoragePort {
   readText(uri: string): Promise<string>;
   writeNew(text: string): Promise<string>;
@@ -33,10 +35,21 @@ export class DocumentRepository {
       return record;
     });
   }
+  async createDocument(name: string): Promise<DocumentRecord> {
+    return this.importDocument(normalizeNewDocumentName(name), '');
+  }
   async open(id: string): Promise<{ record: DocumentRecord; source: string }> {
-    const record = (await this.list()).find(value => value.id === id);
-    if (!record) throw new Error('找不到这份文档，请重新打开文件。');
-    return { record, source: await this.storage.readText(record.draftUri ?? record.contentUri) };
+    return this.enqueue(async () => {
+      const records = await this.list();
+      const index = records.findIndex(value => value.id === id);
+      if (index < 0) throw new Error('找不到这份文档，请重新打开文件。');
+      const source = await this.storage.readText(records[index].draftUri ?? records[index].contentUri);
+      const record = { ...records[index], updatedAt: Math.max(Date.now(), records[index].updatedAt + 1) };
+      records[index] = record;
+      // A recency write is useful but must never make the document itself unreadable.
+      try { await this.storage.setIndex(JSON.stringify(records)); } catch { /* Preserve the prior index and continue opening. */ }
+      return { record, source };
+    });
   }
   async saveDraft(id: string, source: string): Promise<void> {
     return this.enqueue(async () => {
@@ -60,5 +73,4 @@ export class DocumentRepository {
     });
   }
 }
-import { validateImport } from './validation';
 

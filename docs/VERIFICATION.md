@@ -3,9 +3,58 @@
 日期：2026-10-18  
 项目：G:\code_file\ai_project\MDLightView（Windows 本地磁盘目录）
 
+## 2026-10-18 新建文档追加验收
+
+在现有 `codex/mdlightview-redesign` 工作区追加“新建文档”功能，没有提交或清理此前已有的本地修改。新增名称校验、仓库创建测试，首页命名面板复用现有本地文档仓库和草稿流程。
+
+| 检查 | 结果 |
+| --- | --- |
+| `npm test` | 26 tests passed（4 files），含名称规范化、非法名称和空白文档持久化用例 |
+| `npm run typecheck` | 通过 |
+| `npm run check:deps` | Dependencies are up to date |
+| `git diff --check` | 通过；Git 仅提示现有工作区文件将按配置转换 LF/CRLF |
+| Android JS 导出 | `work/android-export-new-document-final` 成功，741 modules / 19 assets；Metro 缓存读取失败后回退全量扫描 |
+| x86_64 / ARM64 Release | 均构建成功；APK v2 签名和单一 ABI 检查通过 |
+| Android 实测 | Android 16 / API 36 / x86_64 模拟器；新建空白文件、命名校验路径、进入编辑、键盘、草稿预览、返回、重开及冷启动隐藏引导均通过 |
+
+新建文档版 Release APK 均使用本机默认 debug 证书，可用于测试安装，不是上架签名包：
+
+| ABI | 文件 | 大小 | SHA-256 |
+| --- | --- | ---: | --- |
+| x86_64 | `work/artifacts/new-document/app-release-x86_64.apk` | 29,936,215 bytes | `79C56F54186DBD68853B062216FB072D9FF03F9ACB2A385D6C93BCF99F838E7D` |
+| arm64-v8a | `work/artifacts/new-document/app-release-arm64-v8a.apk` | 29,507,500 bytes | `3DDF0021BE97530B94B7067F3117378B4194DEBF113AA96867D5C706E0FA89F6` |
+
+新建文档截图及本次 APK 索引见 `work/artifacts/new-document/README.md`。APK 应用标识 `com.mdlightview.app`，版本 `0.1.0`，minSdk 24、targetSdk 36。ARM64 包完成构建、ABI 与签名验证，但没有 ARM64 实体设备安装实测。模拟器验收使用临时用户 12，结束后已移除；用户 0 的应用数据未清除。
+
+## 2026-10-18 UI 重设计追加验收
+
+本次从干净的 Git 工作区开始，在 `codex/mdlightview-redesign` 分支完成源码修改；无自动提交、推送或发布。前文保留了 Android 文件打开与分享底座的历史验证记录，以下是本次新增 UI 与交付验证。
+
+| 检查 | 结果 |
+| --- | --- |
+| `npm test` | 23 tests passed（4 files）；首次首页引导 10 项覆盖首次显示、重启隐藏、当前会话返回、升级用户、延迟存储和初始外部路由 |
+| `npm run typecheck` | 通过 |
+| `npx expo install --check` | Dependencies are up to date |
+| `npx expo export --platform android --output-dir work/ui-redesign-android-export` | 通过，740 modules、19 assets；Metro 旧缓存版本不兼容时自动全量重建 |
+| Android Release | x86_64 与 ARM64 均构建成功，JavaScript bundle 已嵌入 |
+| Git whitespace check | `git diff --check` 通过 |
+
+新版 APK 均位于 `work/artifacts/ui-redesign/`，不覆盖历史产物：
+
+| ABI | 文件大小 | SHA-256 | 检查 |
+| --- | ---: | --- | --- |
+| x86_64 | 29,929,735 bytes | `501BCD7C4D0AAAA060A42AA9E75CD16FDCB060BDF8B1C39AE8F430900CB38EB3` | 仅含 x86_64 原生库；APK v2 签名通过；安装到模拟器 |
+| arm64-v8a | 29,501,020 bytes | `F659ECDE2BEAABB46836AF279E3C0514D02E7F5A139464299DA0B3AD9322CBEF` | 仅含 arm64-v8a 原生库；APK v2 签名通过 |
+
+Android 默认 Release 输出在验收后恢复为原有 ARM64 APK，SHA-256 仍为 `93828A7A1551E66F070C39276844DB1549BAD0F5FD852356D23FB2036188A2E8`。本次新 ARM64 APK 已复制到单独交付路径。
+
+模拟器为 `emulator-5554`，Android 16 / API 36 / x86_64。全新状态使用临时 Android 用户 10 与 11 测试，完成后均移除，未清除原有用户 0 的应用数据。实测：首次空首页显示示例，返回首页时仍显示；强制停止后隐藏示例；最新 x86_64 包在首次首页前通过文本 `ACTION_SEND` 直达阅读页，之后返回首页才显示示例，下一次冷启动隐藏；实际最近记录、23% 阅读进度、手工主题、编辑草稿和草稿标签在重启后恢复；目录跳转和系统返回关闭；浅/深及跟随系统切换；编辑键盘弹出时操作栏可用；另存副本到 Documents 后由应用重新打开；文本分享进入阅读页。两种 ABI 的 APK 内嵌 JS 哈希一致。截图目录为 `work/artifacts/ui-redesign/`。
+
+临时用户首次启动时 Android 系统文件选择器约等待 9 秒完成 Documents provider 扫描，随后保存和重新打开成功；这是测试用户/模拟器系统负载，不是应用错误。ARM64 包未在实体设备安装；本轮未重测历史验收清单中的 ACTION_VIEW 文件 Intent、第三方文件 Sharesheet、受限 provider 写入失败场景。
+
 ## 检查范围与环境
 
-本轮开始时重新读取 README、MVP 设计、实施计划、验证记录、依赖补丁说明和 Android 验收清单；项目内容并非空目录，已有实现均保留。未发现适用的 AGENTS.md。此目录没有 .git 元数据，因此无法提供 Git status 或提交差异；没有自动提交、推送或发布。
+此前 Android 基线轮次开始时重新读取 README、MVP 设计、实施计划、验证记录、依赖补丁说明和 Android 验收清单；项目内容并非空目录，已有实现均保留。当前 UI 重设计轮次使用的 Git 状态、分支和修改说明见上方追加验收记录。未发现适用的 AGENTS.md。
 
 | 项目 | 本轮实测 |
 | --- | --- |

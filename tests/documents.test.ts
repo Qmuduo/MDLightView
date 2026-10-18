@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { validateImport, validateLocalUri, exportName, validateUtf8Bytes } from '../src/features/documents/validation';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { validateImport, validateLocalUri, exportName, validateUtf8Bytes, normalizeNewDocumentName } from '../src/features/documents/validation';
 import { DocumentRepository, type StoragePort } from '../src/features/documents/repository';
 
 class MemoryStorage implements StoragePort {
@@ -14,6 +14,17 @@ class MemoryStorage implements StoragePort {
 }
 
 describe('document boundaries', () => {
+  it('normalizes a new document title to a Markdown filename', () => {
+    expect(normalizeNewDocumentName('  阅读笔记  ')).toBe('阅读笔记.md');
+    expect(normalizeNewDocumentName('notes.MARKDOWN')).toBe('notes.MARKDOWN');
+    expect(normalizeNewDocumentName('notes.md')).toBe('notes.md');
+  });
+  it('rejects empty, unsupported, and path-like new document names', () => {
+    expect(() => normalizeNewDocumentName('  ')).toThrow('请输入文件名。');
+    expect(() => normalizeNewDocumentName('notes.txt')).toThrow('新建文件请使用 .md 或 .markdown 扩展名。');
+    expect(() => normalizeNewDocumentName('../notes')).toThrow('文件名不能包含路径或特殊字符。');
+    expect(() => normalizeNewDocumentName('.md')).toThrow('请输入有效的文件名。');
+  });
   it('accepts Markdown case insensitively but rejects binary, unsupported and oversized content', () => {
     expect(() => validateImport('说明.MD', '# 中文')).not.toThrow();
     expect(() => validateImport('bad.pdf', 'text')).toThrow();
@@ -39,6 +50,36 @@ describe('document boundaries', () => {
 });
 
 describe('recoverable document storage', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('moves a document to the top of recent reading when it is reopened', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-17T09:00:00'));
+    const repo = new DocumentRepository(new MemoryStorage());
+    const first = await repo.importDocument('first.md', 'first');
+    vi.advanceTimersByTime(60_000);
+    const second = await repo.importDocument('second.md', 'second');
+    vi.advanceTimersByTime(60_000);
+
+    await repo.open(first.id);
+
+    const recent = await repo.list();
+    expect(recent.map(record => record.id)).toEqual([first.id, second.id]);
+    expect(recent[0].updatedAt).toBeGreaterThan(second.updatedAt);
+  });
+
+  it('creates a blank Markdown record that can be opened and appears in recent documents', async () => {
+    const store = new MemoryStorage();
+    const repo = new DocumentRepository(store);
+
+    const created = await repo.createDocument('新笔记');
+
+    expect(created.name).toBe('新笔记.md');
+    expect(await store.readText(created.contentUri)).toBe('');
+    expect(await repo.open(created.id)).toMatchObject({ record: { id: created.id }, source: '' });
+    expect((await repo.list()).map(record => record.id)).toContain(created.id);
+  });
+
   it('restores drafts and clamps reading progress after restart', async () => {
     const store = new MemoryStorage(); const repo = new DocumentRepository(store);
     const doc = await repo.importDocument('a.md', '# original');

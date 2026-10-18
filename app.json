@@ -22,7 +22,8 @@
             "multipleShareMimeTypes": []
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "ios": {
       "supportsTablet": true

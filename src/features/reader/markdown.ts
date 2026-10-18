@@ -30,12 +30,12 @@ export function buildReaderPage(source: string, theme: 'light' | 'dark', progres
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-mdlightview'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <style>
-:root{color-scheme:${theme}}*{box-sizing:border-box}html{background:${colors.paper};color:${colors.text};overflow-wrap:anywhere;scroll-padding-top:24px}
-body{max-width:780px;margin:0 auto;padding:26px 24px 100px;font:18px/1.85 -apple-system,BlinkMacSystemFont,"Noto Sans",sans-serif}
-h1,h2,h3,h4,h5,h6{line-height:1.45;scroll-margin-top:24px;font-weight:700}h1{font-size:32px;letter-spacing:-.6px;margin:10px 0 30px;font-family:serif}h2{font-size:25px;margin:40px 0 18px}h3{font-size:21px;margin-top:28px}p{margin:0 0 22px}
-a{color:${colors.accent};text-underline-offset:4px}blockquote{margin:24px 0;padding:4px 18px;border-left:3px solid ${colors.accent};color:${colors.muted}}blockquote p:last-child{margin-bottom:0}
-pre{padding:18px;overflow-x:auto;white-space:pre;background:${colors.soft};border-radius:10px;font-size:14px;line-height:1.7}code{font-family:monospace;font-size:.88em;background:${colors.soft};padding:2px 5px;border-radius:4px}pre code{background:none;padding:0;font-size:inherit}
-ul,ol{padding-left:26px}li{margin:8px 0}.table-scroll{overflow-x:auto;margin:24px 0}table{border-collapse:collapse;min-width:100%;font-size:15px}th,td{border:1px solid ${colors.border};padding:10px 14px;text-align:left;white-space:nowrap}th{background:${colors.soft}}hr{border:0;border-top:1px solid ${colors.border};margin:36px 0}.image-placeholder{display:block;color:${colors.muted};font-size:14px;padding:12px;background:${colors.soft};border-radius:8px}
+:root{color-scheme:${theme}}*{box-sizing:border-box}html{background:${colors.paper};color:${colors.text};overflow-wrap:anywhere;scroll-padding-top:20px;-webkit-text-size-adjust:100%}
+body{max-width:780px;min-height:100vh;margin:0 auto;padding:21px 22px 58px;font:16px/1.88 -apple-system,BlinkMacSystemFont,"Noto Sans",sans-serif}
+h1,h2,h3,h4,h5,h6{line-height:1.5;scroll-margin-top:20px;font-weight:650}h1{font-size:30px;letter-spacing:-.45px;margin:8px 0 18px}h2{font-size:21px;margin:31px 0 14px}h3{font-size:18px;margin:25px 0 12px}h4,h5,h6{font-size:16px;margin:22px 0 10px}p{margin:0 0 19px}
+a{color:${colors.accent};text-underline-offset:4px}blockquote{margin:22px 0;padding:7px 16px;border-left:3px solid ${colors.water};color:${colors.muted};font-size:.94em;line-height:1.9}blockquote p:last-child{margin-bottom:0}
+pre{padding:16px;overflow:auto;white-space:pre;background:${colors.background};border:1px solid ${colors.border};border-radius:10px;font-size:13px;line-height:1.75}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88em;background:${colors.soft};padding:2px 5px;border-radius:4px}pre code{background:none;padding:0;font-size:inherit}
+ul,ol{padding-left:25px}li{margin:6px 0}.table-scroll{overflow-x:auto;margin:22px 0;border-radius:9px}table{border-collapse:collapse;min-width:100%;font-size:14px}th,td{border:1px solid ${colors.border};padding:9px 12px;text-align:left;white-space:nowrap}th{background:${colors.soft};font-weight:600}hr{border:0;border-top:1px solid ${colors.border};margin:31px 0}.image-placeholder{display:block;color:${colors.muted};font-size:13px;padding:12px;background:${colors.soft};border-radius:8px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style></head><body><main>${html}</main>
 <script nonce="mdlightview">

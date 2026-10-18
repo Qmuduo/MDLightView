@@ -26,6 +26,18 @@ export function validateImport(name: string, source: string): void {
   }
 }
 
+export function normalizeNewDocumentName(value: string): string {
+  const name = value.trim();
+  if (!name) throw new Error('请输入文件名。');
+  if (/[\\/:*?"<>|\u0000-\u001f]/.test(name)) throw new Error('文件名不能包含路径或特殊字符。');
+
+  const extension = name.match(/\.(md|markdown)$/i)?.[0];
+  const base = extension ? name.slice(0, -extension.length) : name;
+  if (!base || /^\.+$/.test(base)) throw new Error('请输入有效的文件名。');
+  if (!extension && /\.[^.]+$/.test(name)) throw new Error('新建文件请使用 .md 或 .markdown 扩展名。');
+  return extension ? name : `${name}.md`;
+}
+
 export function validateLocalUri(uri: string): void {
   if (!/^(content|file):\/\/.+/i.test(uri)) throw new Error('只支持本地文件，不会下载远程文档。');
 }
